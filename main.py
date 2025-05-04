@@ -1,35 +1,22 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QApplication
+from login_window import LoginWindow
+from main_window import MainWindow
+from db import create_users_table, create_books_table, add_user
 
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
+if __name__ == '__main__':
+    create_users_table()
+    create_books_table()
 
-        self.setWindowTitle("Biblioteka")
-        self.setGeometry(100, 100, 400, 300)
+    try:
+        add_user("admin", "admin123", role="admin")
+    except:
+        pass
 
-        
-        self.layout = QVBoxLayout()
+    app = QApplication(sys.argv)
+    login = LoginWindow()
 
-        
-        self.label = QLabel("Lista książek:", self)
-        self.layout.addWidget(self.label)
-
-        
-        self.add_button = QPushButton("Dodaj książkę", self)
-        self.add_button.clicked.connect(self.add_book)
-        self.layout.addWidget(self.add_button)
-
-        
-        self.setLayout(self.layout)
-
-    def add_book(self):
-        print("Kliknięto przycisk 'Dodaj książkę'")
-
-
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-
-sys.exit(app.exec_())
-
+    if login.exec_():  # Po udanym logowaniu
+        window = MainWindow()
+        window.show()  # Główne okno wyświetlane na pełnym ekranie
+        sys.exit(app.exec_())
