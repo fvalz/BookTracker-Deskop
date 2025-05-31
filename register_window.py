@@ -5,7 +5,7 @@ class RegisterWindow(QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Rejestracja")
-        self.setFixedSize(300, 250)
+        self.setFixedSize(320, 360)
 
         layout = QVBoxLayout()
 
@@ -31,6 +31,16 @@ class RegisterWindow(QDialog):
         layout.addWidget(QLabel("Potwierdź hasło:"))
         layout.addWidget(self.confirm_password_input)
 
+        # Przeniesiona informacja o wymaganiach hasła
+        password_rules = QLabel(
+            "⚠️ Hasło musi zawierać:\n"
+            "• przynajmniej 6 znaków,\n"
+            "• co najmniej 1 dużą literę,\n"
+            "• 1 znak specjalny np. $, %, ^"
+        )
+        password_rules.setStyleSheet("color: #666; font-size: 11px;")
+        layout.addWidget(password_rules)
+
         self.register_button = QPushButton("Zarejestruj")
         self.register_button.clicked.connect(self.handle_register)
         layout.addWidget(self.register_button)
@@ -51,6 +61,12 @@ class RegisterWindow(QDialog):
             QMessageBox.warning(self, "Błąd", "Hasła nie są takie same.")
             return
 
+        if len(password) < 6 or \
+           not any(c.isupper() for c in password) or \
+           not any(c in '$%^&*!@#' for c in password):
+            QMessageBox.warning(self, "Błąd", "Hasło nie spełnia wymagań.")
+            return
+
         if get_user_by_username(username):
             QMessageBox.warning(self, "Błąd", "Użytkownik o tej nazwie już istnieje.")
             return
@@ -59,6 +75,6 @@ class RegisterWindow(QDialog):
             QMessageBox.warning(self, "Błąd", "Użytkownik z tym adresem e-mail już istnieje.")
             return
 
-        add_user(username, password, email)
+        add_user(username, email, password)
         QMessageBox.information(self, "Sukces", "Rejestracja zakończona sukcesem!")
-        self.accept()  # <-- Zamyka okno rejestracji
+        self.accept()
